@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Set;
+import javax.transaction.Transactional;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -46,4 +47,7 @@ public class User {
     @JsonManagedReference
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<Payment> payments;
+    
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private Auth auth;
 }

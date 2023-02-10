@@ -8,7 +8,9 @@ import com.bitcoin.interview.repository.UserRepository;
 import com.bitcoin.interview.service.exception.AuthNotFoundException;
 import com.bitcoin.interview.service.exception.UserNotAdminException;
 import com.bitcoin.interview.service.exception.UserNotFoundException;
+import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Session;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -52,6 +54,7 @@ public class AuthService implements IAuthService{
         Auth auth = authRepository.findByKey(key).orElseThrow(() -> new AuthNotFoundException("Not found Auth"));
         
         User user = auth.getUser();
+
         //Check again if user has the admin right or not
         if (!user.getIsAdmin()) {
             throw new UserNotAdminException("User is not allowed to do this action."); 

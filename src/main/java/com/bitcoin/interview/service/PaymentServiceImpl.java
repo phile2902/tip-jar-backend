@@ -101,6 +101,7 @@ public class PaymentServiceImpl implements IPaymentService{
 
     @Override
     public void deleteById(Long id) {
+        System.err.println("Delete by Id");
         paymentRepository.deleteById(id);
     }
 
