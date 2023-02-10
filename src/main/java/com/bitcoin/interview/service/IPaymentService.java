@@ -1,12 +1,11 @@
 package com.bitcoin.interview.service;
 
 import com.bitcoin.interview.model.Payment;
-import com.bitcoin.interview.service.exception.UserNotFoundException;
 
 import java.util.List;
 
 public interface IPaymentService {
-    List<Payment> getAllByUserId(Long userId) throws UserNotFoundException;
+    List<Payment> getAllByUserId(Long userId);
 
     Payment createByUserId(Long userId, Payment payment);
 

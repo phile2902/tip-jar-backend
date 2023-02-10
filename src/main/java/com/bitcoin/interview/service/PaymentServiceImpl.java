@@ -4,8 +4,7 @@ import com.bitcoin.interview.model.Payment;
 import com.bitcoin.interview.repository.PaymentRepository;
 import com.bitcoin.interview.repository.UserRepository;
 import com.bitcoin.interview.service.exception.FailedToCreatePaymentException;
-import com.bitcoin.interview.service.exception.PaymentNotFoundException;
-import com.bitcoin.interview.service.exception.UserNotFoundException;
+import com.bitcoin.interview.service.exception.ResourceNotFoundException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,7 @@ public class PaymentServiceImpl implements IPaymentService{
     private final PaymentRepository paymentRepository;
 
     @Override
-    public List<Payment> getAllByUserId(Long userId) throws UserNotFoundException {
+    public List<Payment> getAllByUserId(Long userId) {
         checkUserExist(userId);
         return paymentRepository.findByUserId(userId);
     }
@@ -38,20 +37,20 @@ public class PaymentServiceImpl implements IPaymentService{
 
         //If saving payment is not successful
         if (savedPayment.isEmpty()) {
-            throw new FailedToCreatePaymentException("Payment is failed to create");
+            throw new FailedToCreatePaymentException("Payment is failed to be created");
         }
 
         return savedPayment.get();
     }
 
     @Override
-    public Payment getLatestByUserId(Long userId) throws UserNotFoundException{
+    public Payment getLatestByUserId(Long userId) {
         return getPaymentByUserIdWithMaxValueOfProperty(userId, "createdAt");
     }
 
-    private void checkUserExist(Long userId) throws UserNotFoundException {
+    private void checkUserExist(Long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException("Not found user");
+            throw new ResourceNotFoundException("Not found user: " + userId);
         }
     }
 
@@ -67,11 +66,10 @@ public class PaymentServiceImpl implements IPaymentService{
         
         //If user has no payments
         if (foundPayments.isEmpty()) {
-            throw new PaymentNotFoundException("Not found payment");
+            throw new ResourceNotFoundException("Not found payments");
         }
         
         Double total = 0.0;
-        
         for (Payment payment : foundPayments) {
             total += payment.getAmount();
         }
@@ -93,7 +91,7 @@ public class PaymentServiceImpl implements IPaymentService{
         List<Payment> sortedPayments = paymentRepository.findByUserId(userId, Sort.by(orders));
         //If user has no payments
         if (sortedPayments.isEmpty()) {
-            throw new PaymentNotFoundException("Not found payment");
+            throw new ResourceNotFoundException("Not found payment");
         }
 
         return sortedPayments.get(0);
@@ -101,14 +99,16 @@ public class PaymentServiceImpl implements IPaymentService{
 
     @Override
     public void deleteById(Long id) {
-        System.err.println("Delete by Id");
+        //Check if payment exists
+        paymentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Not found payment"));
+        
         paymentRepository.deleteById(id);
     }
 
     @Override
     public Payment updateById(Long id, Payment payment) {
         //Found existing payment and update with new data, we dont allow to update user relation to the payment
-        Payment existingPayment = paymentRepository.findById(id).orElseThrow(() -> new PaymentNotFoundException("Not found payment"));
+        Payment existingPayment = paymentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Not found payment"));
         existingPayment.setAmount(payment.getAmount());
         existingPayment.setTip(payment.getTip());
         existingPayment.setThumbnail(payment.getThumbnail());

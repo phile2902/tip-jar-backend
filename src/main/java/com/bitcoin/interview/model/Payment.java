@@ -11,7 +11,6 @@ import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import javax.transaction.Transactional;
 
 @Data
 @Entity

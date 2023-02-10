@@ -6,8 +6,7 @@ import com.bitcoin.interview.repository.PaymentRepository;
 import com.bitcoin.interview.repository.UserRepository;
 import com.bitcoin.interview.service.PaymentServiceImpl;
 import com.bitcoin.interview.service.exception.FailedToCreatePaymentException;
-import com.bitcoin.interview.service.exception.PaymentNotFoundException;
-import com.bitcoin.interview.service.exception.UserNotFoundException;
+import com.bitcoin.interview.service.exception.ResourceNotFoundException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,7 +54,7 @@ public class PaymentServiceImplTest {
         );
     }
 
-    @Test(expected = UserNotFoundException.class)
+    @Test(expected = ResourceNotFoundException.class)
     public void testGetAllByUserIdThrowsOnUserNotFound() {
         Long userId = 1L;
         Mockito.when(userRepository.existsById(userId)).thenReturn(false);
@@ -80,7 +79,7 @@ public class PaymentServiceImplTest {
         Assert.assertEquals(payment, paymentService.getLatestByUserId(userId));
     }
 
-    @Test(expected = UserNotFoundException.class)
+    @Test(expected = ResourceNotFoundException.class)
     public void testGetLatestByUserIdThrowNotFoundUser() {
         Long userId = 1L;
         Mockito.when(userRepository.existsById(userId)).thenReturn(false);
@@ -88,7 +87,7 @@ public class PaymentServiceImplTest {
         paymentService.getLatestByUserId(userId);
     }
 
-    @Test(expected = PaymentNotFoundException.class)
+    @Test(expected = ResourceNotFoundException.class)
     public void testGetLatestByUserIdThrowNotFoundPayment() {
         Long userId = 1L;
 
@@ -118,7 +117,7 @@ public class PaymentServiceImplTest {
         Assert.assertEquals(savedPayment, paymentService.createByUserId(userId, newPayment));
     }
 
-    @Test(expected = UserNotFoundException.class)
+    @Test(expected = ResourceNotFoundException.class)
     public void testCreateByUserIdThrowNotFoundUser() {
         Long userId = 1L;
         Mockito.when(userRepository.existsById(userId)).thenReturn(false);

@@ -2,8 +2,6 @@ package com.bitcoin.interview.controller;
 
 import com.bitcoin.interview.model.Payment;
 import com.bitcoin.interview.service.IPaymentService;
-import com.bitcoin.interview.service.exception.PaymentNotFoundException;
-import com.bitcoin.interview.service.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +24,7 @@ public class PaymentController {
      * This api to return all payments history belongs to a known user
      */
     @GetMapping("/user/{userId}/payments")
-    public ResponseEntity<List<Payment>> getAll(@PathVariable(value = "userId") Long userId) throws UserNotFoundException {
+    public ResponseEntity<List<Payment>> getAll(@PathVariable(value = "userId") Long userId) {
         return ResponseEntity.ok().body(paymentService.getAllByUserId(userId));
     }
 
@@ -52,8 +50,7 @@ public class PaymentController {
      * This api to return the total amount of payments during a period
      */
     @GetMapping("/user/{userId}/payments/calculateTotal")
-    public ResponseEntity<Double> getTotalPaymentInPeriod(@PathVariable(value = "userId") Long userId, @RequestParam String from, @RequestParam String to) 
-    throws PaymentNotFoundException {
+    public ResponseEntity<Double> getTotalPaymentInPeriod(@PathVariable(value = "userId") Long userId, @RequestParam String from, @RequestParam String to) {
         return ResponseEntity.ok().body(paymentService.getTotalByUserIdInPeriod(userId, from, to));
     }
     
@@ -61,8 +58,7 @@ public class PaymentController {
      * This api to return the latest history belongs to a known user
      */
     @GetMapping("/user/{userId}/payments/mostExpensive")
-    public ResponseEntity<Payment> getMostExpensivePayment(@PathVariable(value = "userId") Long userId) 
-    throws PaymentNotFoundException {
+    public ResponseEntity<Payment> getMostExpensivePayment(@PathVariable(value = "userId") Long userId) {
         return ResponseEntity.ok().body(paymentService.getMostExpensiveByUserId(userId));
     }
 }
