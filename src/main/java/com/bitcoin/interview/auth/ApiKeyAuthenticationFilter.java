@@ -30,9 +30,10 @@ public class ApiKeyAuthenticationFilter implements Filter {
             throws IOException, ServletException
     {
         if(request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
-            String apiKey = getApiKey((HttpServletRequest) request);
-            if(apiKey != null) {
-                if(isValidApiKey(apiKey)) {
+            String requestUri = ((HttpServletRequest)request).getRequestURL().toString();
+            if (requestUri.contains("/api/v1/managements")) {
+                String apiKey = getApiKey((HttpServletRequest) request);
+                if(apiKey != null && isValidApiKey(apiKey)) {
                     ApiKeyAuthenticationToken apiToken = new ApiKeyAuthenticationToken(apiKey, AuthorityUtils.NO_AUTHORITIES);
                     SecurityContextHolder.getContext().setAuthentication(apiToken);
                 } else {
@@ -61,5 +62,4 @@ public class ApiKeyAuthenticationFilter implements Filter {
     private String getApiKey(HttpServletRequest httpRequest) {
         return httpRequest.getHeader(AUTH_KEY);
     }
-    
 }

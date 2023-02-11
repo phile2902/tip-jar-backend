@@ -21,8 +21,7 @@ public class AuthService implements IAuthService{
 
     @Override
     public String generateApiKeyToAdmin(Long userId) throws Exception{
-        //Check if user exist and is admin user
-        checkUserExist(userId);
+        //Check if user is admin user
         checkAdminUser(userId);
         
         Optional<Auth> existedAuth = authRepository.findByUserId(userId);
@@ -41,12 +40,6 @@ public class AuthService implements IAuthService{
         }
         
         return apiKeyEncryptorDecryptor.encryptApiKey(key);
-    }
-    
-    private void checkUserExist(Long userId) throws ResourceNotFoundException {
-        if (!userRepository.existsById(userId)) {
-            throw new ResourceNotFoundException("Not found user");
-        }
     }
     
     private void checkAdminUser(Long userId) {

@@ -15,7 +15,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class PaymentServiceImpl implements IPaymentService{
+public class PaymentService implements IPaymentService{
     private final UserRepository userRepository;
     private final PaymentRepository paymentRepository;
 

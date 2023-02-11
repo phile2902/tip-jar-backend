@@ -26,7 +26,7 @@ public class ManagementController {
     }
     
     @PutMapping("/payments/{id}")
-    public ResponseEntity<Payment> createPayment(@PathVariable(value = "id") Long id,
+    public ResponseEntity<Payment> updatePayment(@PathVariable(value = "id") Long id,
                                                  @Valid @RequestBody Payment payment) {
         logger.info("Update payment request: {}", payment);
         return new ResponseEntity<>(paymentService.updateById(id, payment), HttpStatus.OK);
