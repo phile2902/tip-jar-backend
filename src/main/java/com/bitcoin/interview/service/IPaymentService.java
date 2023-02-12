@@ -10,12 +10,12 @@ public interface IPaymentService {
     Payment createByUserId(Long userId, Payment payment);
 
     Payment getLatestByUserId(Long userId);
-    
+
     Double getTotalByUserIdInPeriod(Long userId, String from, String to);
-    
+
     Payment getMostExpensiveByUserId(Long userId);
-    
+
     void deleteById(Long id);
-    
+
     Payment updateById(Long id, Payment payment);
 }

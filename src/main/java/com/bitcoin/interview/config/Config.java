@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 public class Config {
     //The config is to enable auto set date to createdAt and updatedAt field when the entity is saved
     @Bean
-    public CustomAuditorAware auditorProvider(){
+    public CustomAuditorAware auditorProvider() {
         return new CustomAuditorAware();
     }
 }

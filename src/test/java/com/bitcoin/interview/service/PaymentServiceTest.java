@@ -4,25 +4,22 @@ import com.bitcoin.interview.model.Payment;
 import com.bitcoin.interview.model.User;
 import com.bitcoin.interview.repository.PaymentRepository;
 import com.bitcoin.interview.repository.UserRepository;
-import com.bitcoin.interview.service.PaymentService;
 import com.bitcoin.interview.service.exception.FailedToCreatePaymentException;
 import com.bitcoin.interview.service.exception.ResourceNotFoundException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Sort;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 public class PaymentServiceTest {
@@ -34,7 +31,7 @@ public class PaymentServiceTest {
 
     @InjectMocks
     private PaymentService paymentService;
-    
+
     @Test
     public void testGetAllByUserId() {
         Long userId = 1L;
@@ -53,20 +50,20 @@ public class PaymentServiceTest {
 
         assertEquals(paymentList.size(), foundPayments.size());
         assertTrue(
-            foundPayments.containsAll(paymentList) &&
-            paymentList.containsAll(foundPayments)
+                foundPayments.containsAll(paymentList) &&
+                        paymentList.containsAll(foundPayments)
         );
     }
-    
+
     @Test
     public void testGetAllByUserId_UserNotFound() {
         // Given
         long userId = 1L;
-        
+
         // When & Then
         assertThrows(ResourceNotFoundException.class, () -> paymentService.getAllByUserId(userId));
     }
-    
+
     @Test
     public void testGetLatestByUserId() {
         Long userId = 1L;
@@ -83,7 +80,7 @@ public class PaymentServiceTest {
 
         assertEquals(payment, paymentService.getLatestByUserId(userId));
     }
-    
+
     @Test
     public void testGetLatestByUserIdThrowNotFoundUser() {
         Long userId = 1L;
@@ -91,7 +88,7 @@ public class PaymentServiceTest {
 
         assertThrows(ResourceNotFoundException.class, () -> paymentService.getLatestByUserId(userId));
     }
-    
+
     @Test
     public void testGetLatestByUserIdThrowNotFoundPayment() {
         Long userId = 1L;
@@ -104,7 +101,7 @@ public class PaymentServiceTest {
 
         assertThrows(ResourceNotFoundException.class, () -> paymentService.getLatestByUserId(userId));
     }
-    
+
     @Test
     public void testCreateByUserId() {
         Long userId = 1L;
@@ -121,7 +118,7 @@ public class PaymentServiceTest {
 
         assertEquals(savedPayment, paymentService.createByUserId(userId, newPayment));
     }
-    
+
     @Test
     public void testCreateByUserIdThrowFailedToSavePayment() {
         Long userId = 1L;
@@ -136,7 +133,7 @@ public class PaymentServiceTest {
 
         assertThrows(FailedToCreatePaymentException.class, () -> paymentService.createByUserId(userId, newPayment));
     }
-    
+
     @Test
     public void testGetMostExpensiveByUserId() {
         Long userId = 1L;
@@ -153,7 +150,7 @@ public class PaymentServiceTest {
 
         assertEquals(payment, paymentService.getMostExpensiveByUserId(userId));
     }
-    
+
     @Test
     public void testGetMostExpensiveByUserIdThrowNotFoundUser() {
         Long userId = 1L;
@@ -161,7 +158,7 @@ public class PaymentServiceTest {
 
         assertThrows(ResourceNotFoundException.class, () -> paymentService.getMostExpensiveByUserId(userId));
     }
-    
+
     @Test
     public void testGetMostExpensiveByUserIdThrowNotFoundPayment() {
         Long userId = 1L;
@@ -174,23 +171,22 @@ public class PaymentServiceTest {
 
         assertThrows(ResourceNotFoundException.class, () -> paymentService.getMostExpensiveByUserId(userId));
     }
-    
+
     @Test
-    public void testGetTotalByUserIdInPeriod()
-    {
+    public void testGetTotalByUserIdInPeriod() {
         Long userId = 1L;
         Mockito.when(userRepository.existsById(userId)).thenReturn(true);
-        
+
         String from = "2023-01-01";
         String to = "2023-02-02";
-        
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate fromTime = LocalDate.parse(from, formatter);
         LocalDate toTime = LocalDate.parse(to, formatter);
-        
+
         Payment payment01 = Mockito.mock(Payment.class);
         when(payment01.getAmount()).thenReturn(100.00);
-        
+
         Payment payment02 = Mockito.mock(Payment.class);
         when(payment02.getAmount()).thenReturn(200.00);
 
@@ -200,60 +196,56 @@ public class PaymentServiceTest {
 
         when(userRepository.existsById(userId)).thenReturn(true);
         when(paymentRepository.findByUserIdAndBetweenCreateDateTime(userId, fromTime, toTime)).thenReturn(paymentList);
-        
+
         assertEquals(300, paymentService.getTotalByUserIdInPeriod(userId, from, to));
     }
-    
+
     @Test
-    public void testGetTotalByUserIdInPeriodNotFoundUser()
-    {
+    public void testGetTotalByUserIdInPeriodNotFoundUser() {
         Long userId = 1L;
         String from = "2023-01-01";
         String to = "2023-02-02";
-        
+
         when(userRepository.existsById(userId)).thenReturn(false);
-        
+
         assertThrows(ResourceNotFoundException.class, () -> paymentService.getTotalByUserIdInPeriod(userId, from, to));
     }
-    
+
     @Test
-    public void testGetTotalByUserIdInPeriodNotFoundPayment()
-    {
+    public void testGetTotalByUserIdInPeriodNotFoundPayment() {
         Long userId = 1L;
         when(userRepository.existsById(userId)).thenReturn(true);
-        
+
         String from = "2023-01-01";
         String to = "2023-02-02";
-        
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate fromTime = LocalDate.parse(from, formatter);
         LocalDate toTime = LocalDate.parse(to, formatter);
-        
+
         when(userRepository.existsById(userId)).thenReturn(true);
         when(paymentRepository.findByUserIdAndBetweenCreateDateTime(userId, fromTime, toTime)).thenReturn(Collections.emptyList());
-        
+
         assertThrows(ResourceNotFoundException.class, () -> paymentService.getTotalByUserIdInPeriod(userId, from, to));
     }
-    
+
     @Test
-    public void testDeleteById()
-    {
+    public void testDeleteById() {
         Long id = 1L;
-        
+
         Payment payment = Mockito.mock(Payment.class);
         when(paymentRepository.findById(id)).thenReturn(Optional.of(payment));
         Mockito.doNothing().when(paymentRepository).deleteById(id);
     }
-    
+
     @Test
-    public void testDeleteByIdNotFoundPayment()
-    {
+    public void testDeleteByIdNotFoundPayment() {
         Long id = 1L;
         when(paymentRepository.findById(id)).thenThrow(ResourceNotFoundException.class);
-        
+
         assertThrows(ResourceNotFoundException.class, () -> paymentService.deleteById(id));
     }
-    
+
     @Test
     public void testUpdateByUserId() {
         Long id = 1L;
@@ -262,7 +254,7 @@ public class PaymentServiceTest {
         when(newPayment.getAmount()).thenReturn(100.00);
         when(newPayment.getTip()).thenReturn(5.00);
         when(newPayment.getThumbnail()).thenReturn("testThumbnail");
-        
+
         Payment existingPayment = Mockito.mock(Payment.class);
         Mockito.doNothing().when(existingPayment).setAmount(100.00);
         Mockito.doNothing().when(existingPayment).setTip(5.00);
@@ -273,7 +265,7 @@ public class PaymentServiceTest {
 
         assertEquals(existingPayment, paymentService.updateById(id, newPayment));
     }
-    
+
     @Test
     public void testUpdateByUserIdNotFoundPayment() {
         Long id = 1L;

@@ -1,15 +1,15 @@
 package com.bitcoin.interview.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
-import java.util.Set;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 @Entity
@@ -29,14 +29,14 @@ public class User {
         this.email = email;
         this.address = address;
     }
-    
+
     public User(String name, String email, String address, Boolean isAdmin) {
         this.name = name;
         this.email = email;
         this.address = address;
         this.isAdmin = isAdmin;
     }
-    
+
     @CreatedDate
     private LocalDateTime createdAt;
 
@@ -46,7 +46,7 @@ public class User {
     @JsonManagedReference
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<Payment> payments;
-    
+
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private Auth auth;
 }

@@ -5,17 +5,19 @@ import com.bitcoin.interview.repository.PaymentRepository;
 import com.bitcoin.interview.repository.UserRepository;
 import com.bitcoin.interview.service.exception.FailedToCreatePaymentException;
 import com.bitcoin.interview.service.exception.ResourceNotFoundException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class PaymentService implements IPaymentService{
+public class PaymentService implements IPaymentService {
     private final UserRepository userRepository;
     private final PaymentRepository paymentRepository;
 
@@ -28,7 +30,7 @@ public class PaymentService implements IPaymentService{
     @Override
     public Payment createByUserId(Long userId, Payment payment) {
         checkUserExist(userId);
-        Optional<Payment> savedPayment =  userRepository.findById(userId).map(
+        Optional<Payment> savedPayment = userRepository.findById(userId).map(
                 user -> {
                     payment.setUser(user);
                     return paymentRepository.save(payment);
@@ -57,23 +59,23 @@ public class PaymentService implements IPaymentService{
     @Override
     public Double getTotalByUserIdInPeriod(Long userId, String from, String to) {
         checkUserExist(userId);
-        
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate fromTime = LocalDate.parse(from, formatter);
         LocalDate toTime = LocalDate.parse(to, formatter);
-        
+
         List<Payment> foundPayments = paymentRepository.findByUserIdAndBetweenCreateDateTime(userId, fromTime, toTime);
-        
+
         //If user has no payments
         if (foundPayments.isEmpty()) {
             throw new ResourceNotFoundException("Not found payments");
         }
-        
+
         Double total = 0.0;
         for (Payment payment : foundPayments) {
             total += payment.getAmount();
         }
-        
+
         return total;
     }
 
@@ -81,7 +83,7 @@ public class PaymentService implements IPaymentService{
     public Payment getMostExpensiveByUserId(Long userId) {
         return getPaymentByUserIdWithMaxValueOfProperty(userId, "amount");
     }
-    
+
     private Payment getPaymentByUserIdWithMaxValueOfProperty(Long userId, String property) {
         checkUserExist(userId);
         //Create order
@@ -101,7 +103,7 @@ public class PaymentService implements IPaymentService{
     public void deleteById(Long id) {
         //Check if payment exists
         paymentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Not found payment"));
-        
+
         paymentRepository.deleteById(id);
     }
 
@@ -112,7 +114,7 @@ public class PaymentService implements IPaymentService{
         existingPayment.setAmount(payment.getAmount());
         existingPayment.setTip(payment.getTip());
         existingPayment.setThumbnail(payment.getThumbnail());
-        
+
         return paymentRepository.save(existingPayment);
     }
 }

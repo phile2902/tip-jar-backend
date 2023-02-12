@@ -1,24 +1,25 @@
 package com.bitcoin.interview.helper;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Base64;
-import java.util.UUID;
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import java.util.Base64;
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class ApiKeyEncryptorDecryptor {
-    
+
     private static final String ALGORITHM = "AES";
-    
+
     @Value("${auth.secret}")
     private String secretKey;
-    
+
     public String generateUUIDKey() {
         return UUID.randomUUID().toString();
     }
@@ -33,6 +34,7 @@ public class ApiKeyEncryptorDecryptor {
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, key);
         byte[] encryptedBytes = cipher.doFinal(uuidKey.getBytes());
+
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
 
@@ -47,6 +49,7 @@ public class ApiKeyEncryptorDecryptor {
         cipher.init(Cipher.DECRYPT_MODE, key);
         byte[] encryptedBytes = Base64.getDecoder().decode(encryptedApiKey);
         byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+
         return new String(decryptedBytes);
     }
 }

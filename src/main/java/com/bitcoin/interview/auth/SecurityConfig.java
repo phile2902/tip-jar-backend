@@ -13,13 +13,13 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final ApiKeyAuthenticationFilter apiAuthenticationFilter;
-    
+
     @Override
-    protected void configure(HttpSecurity http) throws Exception {        
-        http.antMatcher("/api/v1/managements/*").
-            csrf().disable().
-            sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
-            and().addFilterBefore(apiAuthenticationFilter, BasicAuthenticationFilter.class)
-            .authorizeRequests().anyRequest().authenticated();
+    protected void configure(HttpSecurity http) throws Exception {
+        http.antMatcher("/api/v1/managements/*")
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().addFilterBefore(apiAuthenticationFilter, BasicAuthenticationFilter.class)
+                .authorizeRequests().anyRequest().authenticated();
     }
 }
