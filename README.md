@@ -1,44 +1,144 @@
 # Tip-jar
-## Problem
-Imagine we have an app as seen in the following link 
-[Design](https://www.figma.com/file/Wjc3WG4kH8IFooV2DLv29v/TipJar?node-id=0%3A1).
+## Description of APIs
+### Get all payment history items
+* URI: "/api/v1/user/{userId}/payments"
+* Method: GET
+* This api is to return all payments belongs to the user.
+* HttpStatusCode 200 returned with an array of payments if it is successful.
+* HttpStatusCode 200 returned with an empty array if the user has no payments.
+* HttpStatusCode 404 returned if the user is not exists.
+* The successful response looks like:
+```
+[
+    {
+        "id": 1,
+        "amount": 2400.0,
+        "tip": 240.0,
+        "thumbnail": "abc",
+        "createdAt": "2022-04-14T00:06:35.569166",
+        "updatedAt": "2022-04-14T00:06:35.569166"
+    },
+    {
+        "id": 2,
+        "amount": 2300.0,
+        "tip": 230.0,
+        "thumbnail": "abc",
+        "createdAt": "2022-04-14T00:06:35.594497",
+        "updatedAt": "2022-04-14T00:06:35.594497"
+    },
+    {
+        "id": 5,
+        "amount": 10.0,
+        "tip": 230.0,
+        "thumbnail": "abc",
+        "createdAt": "2022-04-14T00:22:41.752192",
+        "updatedAt": "2022-04-14T00:22:41.752192"
+    }
+]
+```
+### Get latest payment history item
+* URI: "/api/v1/user/{userId}/payments/latest"
+* Method: GET
+* This api is to return the latest payment belongs to the user.
+* HttpStatusCode 200 returned with a payment object if it is successful.
+* HttpStatusCode 404 returned if the user is not exists or the user has no payments.
+* The successful response looks like:
+```
+{
+    "id": 2,
+    "amount": 2300.0,
+    "tip": 230.0,
+    "thumbnail": "abc",
+    "createdAt": "2022-04-14T00:06:35.594497",
+    "updatedAt": "2022-04-14T00:06:35.594497"
+}
+```
+### Save payment history item
+* URI: "/api/v1/user/{userId}/payment"
+* Method: POST
+* This api is to create a new payment belongs to the user.
+* HttpStatusCode 201 returned with a payment object if it is successful.
+* HttpStatusCode 404 returned if the user is not exists.
+* HttpStatusCode 500 returned if it is failed to save the payment.
+* The successful response looks like:
+```
+{
+    "id": 2,
+    "amount": 2300.0,
+    "tip": 230.0,
+    "thumbnail": "abc",
+    "createdAt": "2022-04-14T00:06:35.594497",
+    "updatedAt": "2022-04-14T00:06:35.594497"
+}
+```
+### Get total paid for a specific duration. Example: “User wants to know how much they have paid between 2021-01-23 and 2021-05-13”
+* URI: "/api/v1/user/{userId}/payments/calculateTotal"
+* Method: GET
+* Query Param
+  * from: the String value of date time to define which time to start looking for. Ex: 2021-01-01
+  * to: the String value of date time to define which time to end looking for. Ex: 2023-01-01
+* This api is to get total paid for a specific duration
+* HttpStatusCode 200 returned with a integer number of total paid
+* HttpStatusCode 404 returned if the user is not exists or not found payments
+* The successful response looks like:
+```
+4400
+```
+### Get the most expensive history item for the user
+* URI: "/api/v1/user/{userId}/payments/mostExpensive"
+* Method: GET
+* This api is to get the most expensive history item for the user
+* HttpStatusCode 200 returned with a integer number of total paid
+* HttpStatusCode 404 returned if the user is not exists or not found payments
+* The successful response looks like:
+```
+{
+    "id": 2,
+    "amount": 2300.0,
+    "tip": 230.0,
+    "thumbnail": "abc",
+    "createdAt": "2022-04-14T00:06:35.594497",
+    "updatedAt": "2022-04-14T00:06:35.594497"
+}
+```
+### Generate API Key to the admin user
+* URI: "/api/v1/user/{userId}/generateApiKey"
+* Method: GET
+* This api is to get the api key which used to authenticate the admin user for calling management apis
+* HttpStatusCode 201 returned with a encrypted string of a key stored in the auth table related to a particular user
+* HttpStatusCode 404 returned if the user is not exists
+* HttpStatusCode 403 returned if it is not an admin user
+* The successful response looks like:
+```
+2HZDeUgNSAU/ugCfkDuHA8nUp4Vsa/yEfLi5260GCXqlP6Fs2vtOynwjYY854aXL
+```
 
-The purpose of this app is to allow users to calculate how much each member of a party should contribute when paying a tip.
-
-Users now wants to be able to store and retrieve their payment history from our server. To solve this problem we 
-need to build an API that supports the following operations.
-
-* Save payment history item
-* Get latest payment history item
-* Get all payment history items
-
-The challenge shouldn't take more than an hour or two, assuming you have an environment set up for Java development. 
-That being said, take as much time as you need to complete it. 
-We're going to be looking at the quality of your code, so make that your main focus.
-
-
-## Instructions
-* Clone this repo locally using git clone
-* Once you have completed the assignment, push the code up to a new private repo and grant access to the following users for code review
-  ```
-  arnkthr
-  AndreasLarssons
-  glennguden
-  ```
-* Then notify your Bitcoin.com hiring contact with a link to your private repo.
-
-## Requirements
-* You are supposed to design and implement a system that covers these API endpoints. We expect the code to be
-built in a manner that makes it easy to write tests and maintain.
-
-* These endpoints need some kind of database to store the payments, so we can retrieve them later.
-
-* We expect you to take full advantage of spring framework and show us that you are comfortable using it.
-
-## Nice to have
-* Utilize reactive frameworks (RxJava, Reactor)
-* Nested resources are great. POST /questions/:question_id/answers is better than POST /answers, and it's easier to code it that way!
-
-## What we'll be looking at
-* Clean, understandable code
-* Either clear experience with the technology we use or the ability to pick them up quickly by referring to the documentation
+## Management APIs (authenticated by API Key in the header with the header name is "apiKey")
+### Delete a payment history item
+* URI: "api/v1/managements/payments/{id}"
+* Method: DELETE
+* This api is to delete a particular payment history item
+* HttpStatusCode 200 returned with a successful message
+* HttpStatusCode 404 returned if the payment not found
+* HttpStatusCode 401 returned if the apiKey is invalid or not provided
+* HttpStatusCode 403 returned if the user is not an admin
+* The successful response looks like:
+```
+Payment was deleted successful
+```
+### Edit a payment history item
+* URI: "api/v1/managements/payments/{id}"
+* Method: PUT
+* This api is to update a new payment belongs to the user.
+* HttpStatusCode 200 returned with a payment object if it is successful.
+* HttpStatusCode 404 returned if the payment is not exists.
+* The successful response looks like:
+```
+{
+    "id": 2,
+    "amount": 2300.0,
+    "tip": 230.0,
+    "thumbnail": "abc",
+    "createdAt": "2022-04-14T00:06:35.594497",
+    "updatedAt": "2022-04-14T00:06:35.594497"
+}
